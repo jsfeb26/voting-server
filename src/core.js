@@ -26,10 +26,20 @@ export function next(state) {
   const entries = state.get('entries')
                        .concat(getWinners(state.get('vote')));
 
-  return state.merge({
-    vote: Map({ pair: entries.take(2) }),
-    entries: entries.skip(2)
-  });
+  if (entries.size === 1) {
+    // create new state by morphing old state
+    // rather than creating from scratch
+    // better idea because it future proofs
+    return state.remove('vote')
+                .remove('entries')
+                .set('winner', entries.first());
+  }
+  else {
+    return state.merge({
+      vote: Map({ pair: entries.take(2) }),
+      entries: entries.skip(2)
+    });
+  }
 }
 
 export function vote(state, entry) {
