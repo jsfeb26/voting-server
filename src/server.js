@@ -13,5 +13,10 @@ export default function startServer(store) {
 
   io.on('connection', (socket) => {
     socket.emit('state', store.getState().toJS());
+
+    // clients emit 'action' events that we feed directly into our Redux store
+    // this a security issue with this as any connected client is allowed to dispatch
+    // any action into the Redux store
+    socket.on('action', store.dispatch.bind(store));
   });
 }
